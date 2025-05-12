@@ -1,0 +1,8 @@
+flask
+requests
+beautifulsoup4
+scikit-learn
+flask
+flask_sqlalchemy
+werkzeug
+pandas

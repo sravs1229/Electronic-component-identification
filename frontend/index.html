@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Electronics Component Identification</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9f9f9;
+            text-align: center;
+            padding: 40px;
+        }
+        h2 {
+            color: #333;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        button {
+            padding: 12px 25px;
+            margin: 10px;
+            border: none;
+            border-radius: 8px;
+            background-color: #0066cc;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0052a3;
+        }
+        input[type="text"] {
+            width: 60%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        .response-box {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #eef6f9;
+            border-radius: 8px;
+            color: #333;
+            font-size: 18px;
+        }
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: crimson;
+        }
+    </style>
+</head>
+<body>
+
+    <button class="logout-btn" onclick="window.location.href='/logout'">Logout</button>
+
+    <div class="container">
+        <h2>Welcome, {{ email }}!</h2>
+        <h3>Electronics Component Identification</h3>
+
+        <button onclick="startRecording()">🎤 Start Recording</button>
+        <button onclick="recognizeSpeech()">🎧 Recognize Speech</button>
+
+        <div class="response-box" id="recordingStatus"></div>
+
+        <hr style="margin: 40px 0;">
+
+        <h3>OR Search by Typing</h3>
+        <form action="/search" method="post">
+            <input type="text" name="typed_input" placeholder="Enter component name..." required>
+            <button type="submit">Search</button>
+        </form>
+
+        <div class="response-box">
+            {{ result_message }}
+        </div>
+    </div>
+
+    <script>
+        function startRecording() {
+            fetch('/start_recording')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("recordingStatus").innerHTML = "🎤 Recording Completed!";
+            });
+        }
+
+        function recognizeSpeech() {
+            fetch('/recognize_speech')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("recordingStatus").innerHTML = data;
+            });
+        }
+    </script>
+
+</body>
+</html>

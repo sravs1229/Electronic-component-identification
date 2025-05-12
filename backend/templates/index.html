@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Electronics Component Identification</title>
+    <style>
+        body {
+            background-color: #d5cfcf;
+            font-family: Arial, sans-serif;
+        }
+        h2 {
+            background-color: #ccf5f5;
+            color: #e91e63;
+            text-align: center;
+            padding: 10px;
+        }
+        .container {
+            text-align: center;
+            padding: 30px;
+        }
+        #output {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        img {
+            margin-top: 20px;
+            max-height: 200px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 15px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Electronics Component Identification</h2>
+    <div class="container">
+        <button onclick="startRecording()">Start Recording</button>
+        <button onclick="recognizeSpeech()">Recognize Speech</button>
+        <div id="output">Please start recording</div>
+        <img id="component-image" src="" style="display:none;" />
+        <p id="description"></p>
+    </div>
+
+    <script>
+        function startRecording() {
+            document.getElementById("output").innerHTML = "Recording started...";
+            document.getElementById("component-image").style.display = "none";
+            document.getElementById("description").innerText = "";
+
+            fetch('/start_recording', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("output").innerHTML = "Recording completed";
+                });
+        }
+
+        function recognizeSpeech() {
+            document.getElementById("output").innerHTML = "Recognizing...";
+            fetch('/recognize_speech', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("output").innerHTML = "Recognized: " + data.recognized;
+                    document.getElementById("description").innerText = data.description;
+
+                    if (data.image) {
+                        document.getElementById("component-image").src = "data:image/png;base64," + data.image;
+                        document.getElementById("component-image").style.display = "block";
+                    } else {
+                        document.getElementById("component-image").style.display = "none";
+                    }
+                });
+        }
+    </script>
+</body>
+</html>

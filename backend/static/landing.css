@@ -1,0 +1,105 @@
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #0e0e23;
+    color: white;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 40px;
+    align-items: center;
+    background: #13132b;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+nav a {
+    margin-left: 20px;
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+}
+
+.btn {
+    padding: 8px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.login {
+    background-color: transparent;
+    border: 1px solid white;
+}
+
+.signup {
+    background-color: #7a5cff;
+    margin-left: 10px;
+}
+
+.hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 60px 100px;
+}
+
+.hero-text {
+    max-width: 50%;
+}
+
+.hero-text h1 {
+    font-size: 42px;
+    margin-bottom: 20px;
+}
+
+.hero-text h1 span {
+    color: #7a5cff;
+}
+
+.hero-text p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.hero-buttons .btn {
+    margin-right: 15px;
+}
+
+.primary {
+    background-color: #7a5cff;
+    color: white;
+}
+
+.secondary {
+    border: 1px solid #7a5cff;
+    color: #7a5cff;
+    background: transparent;
+}
+
+.stats {
+    display: flex;
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.stats div {
+    text-align: center;
+    font-size: 14px;
+}
+
+.stats strong {
+    font-size: 24px;
+    display: block;
+}
+
+.hero-image img {
+    width: 400px;
+    border-radius: 10px;
+}

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Component Identification</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1b1b3a, #391a49);
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: auto;
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            font-size: 28px;
+        }
+
+        button {
+            background-color: #8758ff;
+            border: none;
+            padding: 12px 25px;
+            color: white;
+            font-size: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            margin: 10px 0;
+            width: 80%;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: none;
+            font-size: 16px;
+        }
+
+        .logout-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #5f5aff;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+        }
+
+        #status {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        #error {
+            color: red;
+        }
+    </style>
+    <script>
+        let recording = false;
+
+        // Function to start recording
+        function startRecording() {
+            const statusElement = document.getElementById("status");
+            const recognizeButton = document.getElementById("recognize-button");
+
+            statusElement.innerText = "🎙️ Recording... Please speak now.";
+            recognizeButton.disabled = true; // Disable the recognize button while recording
+            recording = true;
+
+            // Simulate 5 seconds of recording
+            setTimeout(() => {
+                statusElement.innerText = "✅ Recording Completed. Ready to process speech.";
+                recognizeButton.disabled = false; // Enable the recognize button after recording
+                recording = false;
+            }, 5000);
+        }
+
+        // Function to recognize speech
+        function recognizeSpeech() {
+            if (recording) {
+                alert("Please wait for recording to complete before recognizing speech.");
+                return;
+            }
+
+            const statusElement = document.getElementById("status");
+            statusElement.innerText = "🎧 Recognizing speech...";
+
+            fetch('/recognize-speech')
+                .then(response => response.json()) // Handle JSON response
+                .then(data => {
+                    if (data.status === "success") {
+                        statusElement.innerText = `🔍 Component Found: ${data.component}`;
+                        setTimeout(() => {
+                            window.location.href = `/component-details?name=${encodeURIComponent(data.component)}`;
+                        }, 3000); // Redirect after 3 seconds
+                    } else {
+                        statusElement.innerText = `⚠️ ${data.message}`;
+                    }
+                })
+                .catch(error => {
+                    console.error("Error during speech recognition:", error);
+                    statusElement.innerText = "❌ Speech recognition failed. Please try again.";
+                });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>Welcome, {{ email }}!</h2>
+        <h3>Electronics Component Identification</h3>
+
+        <!-- Start Recording Button -->
+        <button onclick="startRecording()">🎤 Start Recording</button>
+
+        <!-- Recognize Speech Button -->
+        <button id="recognize-button" onclick="recognizeSpeech()" disabled>🎧 Recognize Speech</button>
+
+        <!-- Status Text -->
+        <p id="status">🎙️ Ready to start.</p>
+        <p id="error"></p>
+        <hr>
+
+        <!-- Search Form -->
+        <form method="POST" action="/search">
+            <h3>OR Search by Typing</h3>
+            <input type="text" name="typed_component" placeholder="Enter component name..." required>
+            <br>
+            <button type="submit">Search</button>
+        </form>
+
+        <!-- Logout Button -->
+        <a href="/logout" class="logout-button">Logout</a>
+    </div>
+</body>
+</html>

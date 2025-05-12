@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register | ECI</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="form-container">
+    <h2>Create an Account</h2>
+    <form method="POST">
+      <input type="text" name="username" placeholder="Username" required><br>
+      <input type="email" name="email" placeholder="Email" required><br>
+      <input type="password" name="password" placeholder="Password" required><br>
+      <input type="password" name="confirm" placeholder="Confirm Password" required><br>
+      <select name="role" required>
+        <option value="" disabled selected>Select Role</option>
+        <option value="student">Student</option>
+        <option value="developer">Developer</option>
+      </select><br>
+      <button type="submit">Create Account</button>
+    </form>
+    <p>Already registered? <a href="/login">Login here</a></p>
+  </div>
+</body>
+</html>
