@@ -72,51 +72,64 @@
         }
     </style>
     <script>
-        let recording = false;
-
-        // Function to start recording
         function startRecording() {
+            const startButton = document.getElementById("start-button");
             const statusElement = document.getElementById("status");
-            const recognizeButton = document.getElementById("recognize-button");
-
             statusElement.innerText = "🎙️ Recording... Please speak now.";
-            recognizeButton.disabled = true; // Disable the recognize button while recording
-            recording = true;
+            startButton.disabled = true;
 
-            // Simulate 5 seconds of recording
-            setTimeout(() => {
-                statusElement.innerText = "✅ Recording Completed. Ready to process speech.";
-                recognizeButton.disabled = false; // Enable the recognize button after recording
-                recording = false;
-            }, 5000);
-        }
-
-        // Function to recognize speech
-        function recognizeSpeech() {
-            if (recording) {
-                alert("Please wait for recording to complete before recognizing speech.");
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                statusElement.innerText = "⚠️ Your browser does not support speech recognition.";
+                startButton.disabled = false;
                 return;
             }
 
-            const statusElement = document.getElementById("status");
-            statusElement.innerText = "🎧 Recognizing speech...";
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
 
-            fetch('/recognize-speech')
-                .then(response => response.json()) // Handle JSON response
+            recognition.onresult = (event) => {
+                const spokenText = event.results[0][0].transcript.trim().toLowerCase();
+                statusElement.innerText = `🎧 Recognized: ${spokenText}`;
+
+                fetch('/voice-search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ spoken_text: spokenText })
+                })
+                .then(response => response.json())
                 .then(data => {
-                    if (data.status === "success") {
+                    if (data.status === 'success') {
                         statusElement.innerText = `🔍 Component Found: ${data.component}`;
-                        setTimeout(() => {
-                            window.location.href = `/component-details?name=${encodeURIComponent(data.component)}`;
-                        }, 3000); // Redirect after 3 seconds
+                        window.location.href = `/component-details?name=${encodeURIComponent(data.component)}`;
                     } else {
                         statusElement.innerText = `⚠️ ${data.message}`;
+                        startButton.disabled = false;
                     }
                 })
                 .catch(error => {
-                    console.error("Error during speech recognition:", error);
-                    statusElement.innerText = "❌ Speech recognition failed. Please try again.";
+                    console.error('Error during speech recognition:', error);
+                    statusElement.innerText = '❌ Speech recognition failed. Please try again.';
+                    startButton.disabled = false;
                 });
+            };
+
+            recognition.onerror = (event) => {
+                statusElement.innerText = `❌ Speech recognition error: ${event.error}`;
+                startButton.disabled = false;
+            };
+
+            recognition.onend = () => {
+                if (startButton.disabled) {
+                    startButton.disabled = false;
+                }
+            };
+
+            recognition.start();
         }
     </script>
 </head>
@@ -126,10 +139,7 @@
         <h3>Electronics Component Identification</h3>
 
         <!-- Start Recording Button -->
-        <button onclick="startRecording()">🎤 Start Recording</button>
-
-        <!-- Recognize Speech Button -->
-        <button id="recognize-button" onclick="recognizeSpeech()" disabled>🎧 Recognize Speech</button>
+        <button id="start-button" onclick="startRecording()">🎤 Start Recording</button>
 
         <!-- Status Text -->
         <p id="status">🎙️ Ready to start.</p>

@@ -81,26 +81,65 @@ def component():
         return redirect(url_for('signin'))
     return render_template('component.html', email=session.get('username', 'User'))
 
+def find_component_by_name(name):
+    name = name.strip().lower()
+    if not name:
+        return None, None
+
+    if name in component_data:
+        return name, component_data[name]
+
+    matched_name = next((key for key in component_data if name in key or key in name), None)
+    if matched_name:
+        return matched_name, component_data[matched_name]
+
+    tokens = [word for word in name.split() if len(word) > 2]
+    if tokens:
+        matched_name = next((key for key in component_data if any(token in key for token in tokens)), None)
+        if matched_name:
+            return matched_name, component_data[matched_name]
+
+    try:
+        result = process.extractOne(name, component_data.keys())
+    except Exception as e:
+        print(f"DEBUG: Fuzzy matching error: {e}")
+        result = None
+
+    if result:
+        matched_candidate, score = result[0], int(result[1])
+        print(f"DEBUG: Fuzzy matched component: '{matched_candidate}' with score: {score}")
+        if score >= 70:
+            return matched_candidate, component_data[matched_candidate]
+
+    return None, None
+
 @app.route('/search', methods=['POST'])
 def search():
     """Search for components by text with fuzzy matching."""
     name = request.form.get('typed_component', '').strip().lower()
     print(f"DEBUG: User searched for: '{name}'")
 
-    # Exact match
-    if name in component_data:
-        component = component_data[name]
-        return render_template('component_details.html', component=component)
-
-    # Fuzzy match
-    best_match, score = process.extractOne(name, component_data.keys())
-    print(f"DEBUG: Fuzzy match result: '{best_match}' with score: {score}")
-
-    if score >= 85:
-        component = component_data[best_match]
+    matched_name, component = find_component_by_name(name)
+    if matched_name:
         return render_template('component_details.html', component=component)
 
     return render_template('component.html', email=session.get('username', 'User'), error="Component not found.")
+
+@app.route('/voice-search', methods=['POST'])
+def voice_search():
+    payload = request.get_json(force=True, silent=True) or {}
+    name = payload.get('spoken_text', '').strip().lower()
+    print(f"DEBUG: Voice search text: '{name}'")
+
+    matched_name, component = find_component_by_name(name)
+    if matched_name:
+        return jsonify({
+            "status": "success",
+            "component": matched_name,
+            "details": component
+        })
+
+    return jsonify({"status": "error", "message": "No matching component found."})
 
 @app.route('/component-details')
 def component_details():
