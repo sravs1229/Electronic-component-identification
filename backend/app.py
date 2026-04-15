@@ -16,6 +16,7 @@ def load_component_data(filename):
         for _, row in data.iterrows():
             name = str(row['Name']).strip().lower()
             component_dict[name] = {
+                "name": name,
                 "image": str(row['Image']).strip() if pd.notna(row['Image']) else 'placeholder.jpg',
                 "description": str(row['Description']).strip() if pd.notna(row['Description']) else 'No description available.',
                 "units": str(row['Units']).strip() if pd.notna(row['Units']) else 'N/A',
